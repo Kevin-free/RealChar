@@ -185,6 +185,7 @@ ELEVEN_LABS_API_KEY=<api key>
     ```sh
     alembic upgrade head
     ```
+    This ensures your database schema is up to date. Please run this after every time you pull the main branch.
 - **Step 5**. Setup `.env`: update API keys and select module
    ```sh
    cp .env.example .env
@@ -217,9 +218,10 @@ ELEVEN_LABS_API_KEY=<api key>
 ## (Optional) 📀 Installation via Docker
 <details><summary>👇click me</summary>
 
-1. Docker image: you can use our docker image directly
+1. Docker image: you can use our docker image directly (if you are not using Apple M1/M2 CPUs)
     ```sh
     docker pull shaunly/real_char:latest
+    docker tag shaunly/real_char:latest realtime-ai-character
     ```
     (Or you want build yourself) Build docker image
     ```sh
@@ -260,9 +262,9 @@ And it should work out of the box.
 - [x] Launch v0.0.1 and build a community
 - [x] Move away from Vanilla JS
 - [x] Launch mobile app (iOS TestFlight Beta link: https://testflight.apple.com/join/JA6p9sZQ)
-- [ ] Add authentication for customization
-- [ ] Allow selecting different LLM
-- [ ] Add ability to add community characters
+- [x] Add authentication for customization
+- [x] Allow selecting different LLM
+- [x] Add ability to add community characters
 
 ## 🫶 Contribute to RealChar
 Please check out our [Contribution Guide](contribute.md)!
