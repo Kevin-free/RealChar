@@ -465,6 +465,7 @@ function createCharacterGroups(message) {
     'Steve Jobs': '/static/jobs.png',
     'Sam Altman': '/static/sam.png',
     'Mark Zuckerberg': '/static/mark_zuckerberg.png',
+    'Arnold Schwarzenegger': '/static/arnold.jpeg',
   };
 
   const radioButtonDiv = document.getElementsByClassName('radio-buttons')[0];
