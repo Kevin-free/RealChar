@@ -504,3 +504,11 @@ Sure, here's a CSV format of the quotes:
 "Arnold Schwarzenegger","Iconic Movie Line","I'll be back."
 
 ---
+
+You
+
+---
+
+github codespaces 是什么？怎么用？我现在Mac终端重启服务，每次都需要等很久。
+
+---
