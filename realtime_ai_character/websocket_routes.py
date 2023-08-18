@@ -39,6 +39,8 @@ GREETING_TXT_MAP = {
     "hi-IN": "नमस्ते मेरे दोस्त, आज आपको यहां क्या लाया है?",
     "pl-PL": "Cześć mój przyjacielu, co cię tu dziś przynosi?",
     "zh-CN": "嗨，我的朋友，今天你为什么来这里？",
+    'ja-JP': "こんにちは、私の友達、今日はどうしたの？",
+    'ko-KR': "안녕, 내 친구, 오늘 여기 왜 왔어?"
 }
 
 
@@ -243,6 +245,7 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                     quivr_info = db.query(QuivrInfo).filter(QuivrInfo.user_id == user_id).first()
                 else:
                     quivr_info = None
+                message_id = str(uuid.uuid4().hex)[:16]
                 response = await llm.achat(
                     history=build_history(conversation_history),
                     user_input=msg_data,
@@ -255,10 +258,10 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                     useSearch=use_search,
                     useQuivr=use_quivr,
                     quivrApiKey=quivr_info.quivr_api_key if quivr_info else None,
-                    quivrBrainId=quivr_info.quivr_brain_id if quivr_info else None)
+                    quivrBrainId=quivr_info.quivr_brain_id if quivr_info else None,
+                    metadata={"message_id": message_id})
 
                 # 3. Send response to client
-                message_id = str(uuid.uuid4().hex)[:16]
                 await manager.send_message(message=f'[end={message_id}]\n',
                                            websocket=websocket)
 
@@ -314,6 +317,7 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                     conversation_history.ai.append(response)
                     token_buffer.clear()
                     # Persist interaction in the database
+                    tools = []
                     if use_search:
                         tools.append('search')
                     if use_quivr:
