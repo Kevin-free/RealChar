@@ -509,7 +509,7 @@ You
 
 ---
 
-github codespaces 是什么？怎么用？我现在Mac终端重启服务，每次都需要等很久。
+github codespaces 是什么？怎么用？我现在 Mac 终端重启服务，每次都需要等很久。
 
 ---
 
@@ -560,6 +560,7 @@ Description:    Ubuntu 20.04.6 LTS
 Release:        20.04
 Codename:       focal
 ```
+
 ---
 
 You
@@ -578,15 +579,17 @@ ChatGPT4
 
 1. 首先，你需要从 Miniconda 的官方网站下载 Miniconda 的安装脚本。你可以访问[Miniconda 下载页面](https://docs.conda.io/en/latest/miniconda.html)。选择适合你的操作系统的 Python 3.x 的安装脚本。例如，如果你正在使用的是 64 位的 Linux，你应该选择 "Miniconda3 Linux 64-bit" 的下载链接。
 
-    在终端中，你可以使用 `wget` 命令下载安装脚本，例如：
-    ```bash
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    ```
+   在终端中，你可以使用 `wget` 命令下载安装脚本，例如：
+
+   ```bash
+   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+   ```
 
 2. 下载完成后，运行安装脚本。这将开始 Miniconda 的安装过程。例如：
-    ```bash
-    bash Miniconda3-latest-Linux-x86_64.sh
-    ```
+
+   ```bash
+   bash Miniconda3-latest-Linux-x86_64.sh
+   ```
 
 3. 接下来，你将看到 Miniconda 的许可协议。按 `Enter` 继续，然后按 `yes` 接受许可协议。
 
@@ -597,16 +600,18 @@ ChatGPT4
 6. 安装完成后，你可以通过运行 `source ~/.bashrc`（如果你选择了将初始化内容添加到 `.bashrc`）或重新打开一个新的终端，来使 Miniconda 生效。
 
 7. 你可以使用以下命令验证 Miniconda 是否已经成功安装：
-    ```bash
-    conda --version
-    ```
+   ```bash
+   conda --version
+   ```
 
 一旦 Miniconda 安装完成，你就可以创建新的虚拟环境了。例如，如果你想创建一个名为 `myenv` 的环境，你可以使用以下命令：
+
 ```bash
 conda create --name myenv
 ```
 
 然后，你可以通过以下命令激活这个环境：
+
 ```bash
 conda activate myenv
 ```
@@ -619,7 +624,7 @@ You
 
 ---
 
-终端上如何获取GitHub项目fork源项目是否有更新？
+终端上如何获取 GitHub 项目 fork 源项目是否有更新？
 
 ---
 
@@ -689,7 +694,7 @@ You
 
 ---
 
-GitHub fork 别人账号的项目到我账号中，别人项目更新了，我 sync fork了，我又提交了，现在别人项目总共493次commit，我的项目500次commit，GitHub显示`This branch is 7 commits ahead of Shaunwei:main.`，这会有什么问题吗？要怎么操作？
+GitHub fork 别人账号的项目到我账号中，别人项目更新了，我 sync fork 了，我又提交了，现在别人项目总共 493 次 commit，我的项目 500 次 commit，GitHub 显示`This branch is 7 commits ahead of Shaunwei:main.`，这会有什么问题吗？要怎么操作？
 
 ---
 
@@ -697,36 +702,35 @@ ChatGPT4
 
 ---
 
-"7 commits ahead"意味着你的分支有7个额外的提交，这些提交在源项目（你fork的那个项目）的主分支上不存在。一般来说，这并不是一个问题，只是说明你的版本和源项目有所不同。然而，如果你希望将这些更改合并回源项目，你可能需要做一些操作。
+"7 commits ahead"意味着你的分支有 7 个额外的提交，这些提交在源项目（你 fork 的那个项目）的主分支上不存在。一般来说，这并不是一个问题，只是说明你的版本和源项目有所不同。然而，如果你希望将这些更改合并回源项目，你可能需要做一些操作。
 
 以下是一些可能的操作：
 
-1. **发起Pull Request：**如果你认为你的更改对源项目有益，你可以在GitHub上发起一个Pull Request，请求源项目的维护者接受你的更改。如果你的Pull Request被接受，那么你的更改将会合并到源项目中，此时源项目将会与你的项目同步。
+1. **发起 Pull Request：**如果你认为你的更改对源项目有益，你可以在 GitHub 上发起一个 Pull Request，请求源项目的维护者接受你的更改。如果你的 Pull Request 被接受，那么你的更改将会合并到源项目中，此时源项目将会与你的项目同步。
 
 2. **与源项目保持同步：**如果你想要保持你的分支与源项目同步，但不希望提交你的更改，你可以重置你的分支。警告：这将会丢失你的所有本地更改。你可以运行以下命令来进行重置：
 
-    ```bash
-    git fetch upstream
-    git reset --hard upstream/main
-    git push origin main --force
-    ```
+   ```bash
+   git fetch upstream
+   git reset --hard upstream/main
+   git push origin main --force
+   ```
 
-    这将会使你的 `main` 分支回退到源项目的 `main` 分支的状态，并且强制推送到你的 GitHub fork。
+   这将会使你的 `main` 分支回退到源项目的 `main` 分支的状态，并且强制推送到你的 GitHub fork。
 
 3. **创建一个新的分支：**如果你希望保留你的更改，但也希望有一个与源项目同步的分支，你可以创建一个新的分支，然后重置这个新的分支：
 
-    ```bash
-    git checkout -b new-branch
-    git fetch upstream
-    git reset --hard upstream/main
-    ```
+   ```bash
+   git checkout -b new-branch
+   git fetch upstream
+   git reset --hard upstream/main
+   ```
 
-    这将会创建一个新的分支，并且将这个新的分支回退到源项目的 `main` 分支的状态。你的原始分支将保持不变。
+   这将会创建一个新的分支，并且将这个新的分支回退到源项目的 `main` 分支的状态。你的原始分支将保持不变。
 
 请根据你的需求选择合适的操作。
 
 ---
-
 
 You
 
@@ -763,5 +767,58 @@ ChatGPT4
 10. **拉取最新的更改：** 所有协作者应该经常拉取主分支的最新更改到本地，使用 `git pull origin <main-branch>`。
 
 以上就是 GitHub 上多人协作的一般流程，当然，具体的工作流程可能根据项目的规模、项目的类型以及团队的偏好而有所不同。
+
+---
+
+## 20230818
+
+You
+
+---
+
+### 同步 fork 仓库 git 命令
+
+1.  git remote -v 查看你的远程仓库的路径：
+
+> 如果只有 origin 的两行, 说明你未设置 upstream （中文叫：上游代码库）
+> 一般情况下，设置好一次 upstream 后就无需重复设置。
+
+2.  执行命令 git remote add upstream [https://github.com/selfteaching/the-craft-of-selfteaching.git](https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fselfteaching%2Fthe-craft-of-selfteaching.git)
+3.  再次执行命令 git remote -v 检查是否成功
+4.  将未提交的提交
+
+5.  执行命令 git fetch upstream 抓取原仓库的更新
+6.  执行命令 git merge upstream/master 合并远程的 master 分支
+7.  执行命令 git push 把本地仓库向 github 仓库（你 fork 到自己名下的仓库）推送修改
+
+### 总结：
+
+```Shell
+git fetch upstream
+
+git merge upstream/master
+
+git push
+```
+
+### 切分支合并 main 分支 git 命令
+
+```Shell
+git switch -c new-branch (if new-branch not exist)
+
+git switch new-branch
+
+git merge main
+
+git push
+```
+
+---
+
+You
+
+---
+
+本地项目，后端是python实现，前端是npm，如何部署到服务器？并使用域名访问？
 
 ---
