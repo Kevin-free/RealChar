@@ -2,6 +2,8 @@ name: CI/CD Pipeline
 
 env:
   CONTAINER_NAME: realchar-container
+  REPO_PROJECT: realchar
+  IMAGE_VERSION: latest
   HOST_PORT: 8080
   CONTAINER_PORT: 8000
 
@@ -31,7 +33,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/realchar:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_PROJECT:$IMAGE_VERSION
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@v0.1.1
@@ -42,7 +44,7 @@ jobs:
           script: |
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/realchar:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_PROJECT:$IMAGE_VERSION
             docker run -d --name $CONTAINER_NAME -p $HOST_PORT:$CONTAINER_PORT ${{ secrets.DOCKERHUB_USERNAME }}/realchar:latest
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
