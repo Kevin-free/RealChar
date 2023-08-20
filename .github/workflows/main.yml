@@ -42,9 +42,9 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            docker stop $CONTAINER_NAME || true
-            docker rm $CONTAINER_NAME || true
+            docker stop ${{ env.CONTAINER_NAME }} || true
+            docker rm ${{ env.CONTAINER_NAME }} || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
-            docker run -d --name $CONTAINER_NAME -p $HOST_PORT:$CONTAINER_PORT ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
+            docker run -d --name ${{ env.CONTAINER_NAME }} -p ${{ env.HOST_PORT }}:${{ env.CONTAINER_PORT }} ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
