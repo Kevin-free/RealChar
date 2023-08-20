@@ -1977,14 +1977,6 @@ Record
 
 ### Step 2: Obtain Authentication Token (your-auth-token)
 
-```Shell
-[cloudshell-user@ip-10-6-119-209 ~]$ aws configure
-AWS Access Key ID [None]: AKIA5UL5QBE7M6DZ4GMF
-AWS Secret Access Key [None]: oAeuPVDT6O9q/PwtnjodjorU2tc34UGlt17pK42d
-Default region name [None]: us-west-2
-Default output format [None]: json
-```
-
 Amazon Web Services (EKS - Amazon EKS):
 Use the aws command-line tool to authenticate and get a token:
 
@@ -3290,5 +3282,58 @@ Here are some steps you can take to troubleshoot and resolve this issue:
    If SSH key authentication continues to pose issues, you might consider using password authentication instead. However, this is generally less secure and not recommended for production environments.
 
 Remember that SSH-related issues often require careful verification of both the local and remote configurations to ensure everything is set up correctly.
+
+---
+
+You
+
+---
+
+step `Deploy to Server` failed, Tell me how to troubleshoot and solve it? error :
+
+======END======
+2023/08/20 09:57:21 ssh.ParsePrivateKey: ssh: no key found
+2023/08/20 09:57:23 ssh: handshake failed: ssh: unable to authenticate, attempted methods [none], no supported methods remain
+
+---
+
+You
+
+---
+
+Github Action 中的`SERVER_SSH_KEY`应该填什么？是服务器上的authorized_keys,id_rsa,id_rsa.pub?
+
+---
+
+ChatGPT
+
+---
+
+In the context of GitHub Actions, the `SERVER_SSH_KEY` secret should contain the private key that corresponds to the public key you've added to the `~/.ssh/authorized_keys` file on your remote server. Here's how to correctly set up the SSH key in the `SERVER_SSH_KEY` secret:
+
+1. **Generate SSH Key Pair:**
+   If you haven't already, generate an SSH key pair on your local machine using the `ssh-keygen` command. This will generate two files: `id_rsa` (private key) and `id_rsa.pub` (public key).
+
+2. **Add Public Key to Server:**
+   Add the content of the `id_rsa.pub` file to the `~/.ssh/authorized_keys` file on your remote server. This allows the private key holder (your GitHub Actions workflow) to authenticate with the server using the corresponding private key.
+
+3. **Add Private Key to GitHub Secret:**
+   In your GitHub repository, navigate to "Settings" > "Secrets" > "New repository secret." Name the secret `SERVER_SSH_KEY` and paste the content of your `id_rsa` private key into the value field.
+
+   Important: When adding the private key to the secret, make sure to include the entire content of the key, including the `-----BEGIN RSA PRIVATE KEY-----` and `-----END RSA PRIVATE KEY-----` lines.
+
+Here's an example of how your `SERVER_SSH_KEY` secret might look in the GitHub repository secrets:
+
+```plaintext
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA1dLxmkLvy7A8P4ddkfw9Q+jVHy6+OAJm54E6Fz6Zuo7xVtJY
+... (rest of the private key content)
+z7Psskx9xB4Xdo7zC3pgcJww4Df2ioQGt6xVwVe+1g5JW/txYh/Fsv8B8ptCXvhJ
+-----END RSA PRIVATE KEY-----
+```
+
+Remember to keep your private key secure and never share it publicly. Storing it as a secret in GitHub ensures that it remains protected.
+
+With the correct private key stored in the `SERVER_SSH_KEY` secret, your GitHub Actions workflow should be able to use it for SSH authentication with the remote server.
 
 ---
