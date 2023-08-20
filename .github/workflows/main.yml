@@ -33,7 +33,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_PROJECT:$IMAGE_VERSION
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@v0.1.1
@@ -44,7 +44,7 @@ jobs:
           script: |
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_PROJECT:$IMAGE_VERSION
-            docker run -d --name $CONTAINER_NAME -p $HOST_PORT:$CONTAINER_PORT ${{ secrets.DOCKERHUB_USERNAME }}/realchar:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
+            docker run -d --name $CONTAINER_NAME -p $HOST_PORT:$CONTAINER_PORT ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
