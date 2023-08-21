@@ -5026,3 +5026,11 @@ You
 Github Action 查看当前分支的命令。
 
 ---
+
+You
+
+---
+
+github action err: zsh:16: command not found: alembic
+
+---
