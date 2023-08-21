@@ -1,5 +1,5 @@
 #!/bin/bash
-# Server
+# Start backend server
 
 cd `dirname $0`/..
 export BASE_DIR=`pwd`
@@ -11,6 +11,6 @@ if [ ! -f "${BASE_DIR}/log/backend.log" ]; then
 echo "create file  ${BASE_DIR}/log/backend.log"
 fi
 
-nohup python cli.py run-uvicorn & tail -f "${BASE_DIR}/log/backend.log"
+nohup python cli.py run-uvicorn >> "${BASE_DIR}/log/backend.log" 2>&1 &
 
 echo "backend is starting，you can check the ${BASE_DIR}/log/backend.log"

@@ -1,15 +1,14 @@
 #!/bin/bash
 
-cd `dirname $0`/..
-export BASE_DIR=`pwd`
-pid=`ps ax | grep -i cli.py | grep "${BASE_DIR}" | grep python | grep -v grep | awk '{print $1}'`
-if [ -z "$pid" ] ; then
-        echo "No Backend running."
-        exit -1;
+# Find the process ID running on port 8000
+pid=$(lsof -t -i :8000)
+
+if [ -z "$pid" ]; then
+    echo "No process running on port 8000."
+    exit -1
 fi
 
-echo "The Backend(${pid}) is running..."
+echo "Killing process ${pid} running on port 8000..."
+kill "$pid"
 
-kill ${pid}
-
-echo "Send shutdown request to Backend(${pid}) OK"
+echo "Process ${pid} killed."

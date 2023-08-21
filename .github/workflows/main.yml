@@ -33,7 +33,9 @@ jobs:
               cd 1618-RealChar
             fi
             echo "Current branch/tag: ${GITHUB_REF}"
+            source $HOME/miniconda/bin/activate realchar-env
             pip install -r requirements.txt
             sqlite3 test.db "VACUUM;"
             alembic upgrade head
-            ./scripts/start_backend.sh
+            ./scripts/restart_backend.sh
+            ./scripts/restart_web.sh

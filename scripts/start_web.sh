@@ -1,4 +1,5 @@
 #!/bin/bash
+# Start web server
 
 cd `dirname $0`/..
 export BASE_DIR=`pwd`
@@ -13,7 +14,6 @@ fi
 python cli.py web-build
 cd client/web
 npm install
-npm start
-tail -f "${BASE_DIR}/log/web.log"
+npm start >> "${BASE_DIR}/log/web.log" 2>&1 &  # Redirect both stdout and stderr to the log file
 
 echo "web is starting，you can check the ${BASE_DIR}/log/web.log"
