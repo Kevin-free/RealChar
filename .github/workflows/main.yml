@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Set up Docker Buildx
@@ -34,7 +34,7 @@ jobs:
       #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
 
   deploy:
-    runs-on: ubuntu-latest   
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
@@ -44,8 +44,8 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |  
-            cd /home/kevin/projects/realchar
-            git pull origin main 
+            cd /home/kevin/projects/161-WDXM/RealChar
+            git pull origin kevin/main 
             make down-v
             make build
             echo "Deleting old image(s)..."
