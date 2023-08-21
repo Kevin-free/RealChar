@@ -4532,3 +4532,16 @@ In this example, the `scp` command is used to copy the `.env` file to the server
 Remember to adjust the script, paths, and other values according to your project's setup. This method doesn't require a specific action for copying files and should work more reliably.
 
 ---
+
+You
+
+---
+
+`deploy`步骤报错：
+```
+Run scp -i ***
+KEY-----: No such file or directory
+```
+是因为本地`.env`没有拷贝到Docker镜像中吗？
+
+---

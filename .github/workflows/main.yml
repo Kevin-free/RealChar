@@ -29,11 +29,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
+      # - name: Build and push
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
 
   deploy:
       needs: build
@@ -42,8 +42,8 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v2
 
-        - name: Copy .env file to server
-          run: scp -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no .env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/kevin/projects/realchar/.env
+        # - name: Copy .env file to server
+        #   run: scp -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no .env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/kevin/projects/realchar/.env
 
         - name: Deploy to Server
           uses: appleboy/ssh-action@v0.1.1
