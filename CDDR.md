@@ -4654,6 +4654,8 @@ Certainly! Here are some commonly used `docker-compose` commands and their meani
 11. **`docker-compose top`**: Displays the running processes of the containers defined in the `docker-compose.yaml` file.
 
 12. **`docker-compose exec <service-name> sh`**: Opens a shell inside a running container for debugging and troubleshooting.
+    
+13. **`docker-compose pull`**: Pull the latest versions of Docker images specified in a `docker-compose.yml` file.
 
 These are just a few of the commonly used `docker-compose` commands. You can run `docker-compose --help` to see a full list of available commands and their descriptions. Remember that the commands should be run in the same directory as the `docker-compose.yaml` file.
 
@@ -4836,3 +4838,10 @@ You should check the status of your self-hosted runner and its configuration to 
 
 ---
 
+You
+
+---
+
+`docker compose up --build -d --remove-orphans`是什么意思？
+
+---
