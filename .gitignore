@@ -172,3 +172,4 @@ cython_debug/
 google_credentials.json
 
 ./node_modules
+nohup.out

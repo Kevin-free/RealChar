@@ -4954,6 +4954,75 @@ ChatGPT
 
 ---
 
+The commands you provided are related to running a Python web application using the Uvicorn ASGI server. Uvicorn is a popular server that serves ASGI applications, such as those built with the FastAPI framework.
 
+1. **`python cli.py run-uvicorn`**:
+   This command likely indicates that there is a CLI (Command Line Interface) module named `cli.py` in your project directory. The `cli.py` module probably contains code to start the Uvicorn server with your FastAPI application. By running this command, you are invoking the Uvicorn server through the CLI module.
+
+2. **`uvicorn realtime_ai_character.main:app`**:
+   This command directly runs the Uvicorn server using the ASGI application object. `realtime_ai_character.main:app` refers to the `app` instance defined in the `main` module of the `realtime_ai_character` package.
+
+To daemonize the startup and run the server in the background, you can use tools like `nohup` (no hang up) on Unix-like systems:
+
+```Shell
+nohup python cli.py run-uvicorn &
+```
+
+or
+
+```Shell
+nohup uvicorn realtime_ai_character.main:app &
+```
+
+The `nohup` command ensures that the process continues running even after the terminal is closed. The `&` at the end puts the process in the background.
+
+For setting this up in a GitHub Action workflow YAML file, you would need to SSH into the server and execute these commands. Here's how you can integrate this into the workflow:
+
+```yaml
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /path/to/your/project
+            nohup python cli.py run-uvicorn &
+```
+
+Replace `/path/to/your/project` with the actual path to your project directory on the server.
+
+Remember that this approach starts the server in the background. You might want to enhance the deployment script to handle restarting the server or managing the process as needed for your application.
+
+---
+
+You
+
+---
+
+What should I do if pull docker image is very slow?
+
+---
+
+You
+
+---
+
+Github Action 查看当前分支的命令。
 
 ---

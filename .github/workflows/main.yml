@@ -32,4 +32,8 @@ jobs:
               git clone git@github.com:Kevin-free/RealChar.git 1618-RealChar
               cd 1618-RealChar
             fi
+            echo "Current branch/tag: ${GITHUB_REF}"
+            pip install -r requirements.txt
+            sqlite3 test.db "VACUUM;"
+            alembic upgrade head
             ./scripts/start.sh

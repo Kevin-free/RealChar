@@ -13,4 +13,4 @@ fi
 
 nohup python cli.py run-uvicorn & tail -f "${BASE_DIR}/log/server.log"
 
-echo "Server is starting，you can check the ${BASE_DIR}/log/server.log"
+echo "BackendServer is starting，you can check the ${BASE_DIR}/log/server.log"
