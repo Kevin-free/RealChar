@@ -1,11 +1,4 @@
-name: CI/CD Pipeline
-
-env:
-  CONTAINER_NAME: ctr-realchar
-  REPO_PROJECT: realchar
-  IMAGE_VERSION: latest
-  HOST_PORT: 8080
-  CONTAINER_PORT: 8000
+name: Deploy to Server
 
 on:
   push:
@@ -14,36 +7,29 @@ on:
       - "kevin/main"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      # - name: Build and push
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     push: true
-      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_PROJECT }}:${{ env.IMAGE_VERSION }}
-
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to VPS
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy to Server
         uses: appleboy/ssh-action@master
         # Don't forget to add environment vars as secrets in repository settings on GitHub
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |  
-            cd /home/kevin/projects/realchar
-            docker compose pull 
-            docker compose up -d
-            exit
+          script: |
+            echo "Changing directory to /home/kevin/projects/161-WDXM"
+            cd /home/kevin/projects/161-WDXM
+            echo "Checking if directory exists..."
+            if [ -d "1618-RealChar" ]; then
+              echo "Directory exists. Changing directory and pulling from git..."
+              cd 1618-RealChar
+              git pull
+            else
+              echo "Directory does not exist. Cloning from git..."
+              git clone git@github.com:Kevin-free/RealChar.git 1618-RealChar
+              cd 1618-RealChar
+            fi
+            ./scripts/start.sh
