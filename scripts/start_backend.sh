@@ -1,16 +1,25 @@
 #!/bin/bash
 # Start backend server
 
-cd `dirname $0`/..
-export BASE_DIR=`pwd`
-echo $BASE_DIR
+cd "$(dirname "$0")/.."
+export BASE_DIR="$(pwd)"
+echo "$BASE_DIR"
 
-# check the nohup.out log output file
-if [ ! -f "${BASE_DIR}/log/backend.log" ]; then
-  touch "${BASE_DIR}/log/backend.log"
-echo "create file  ${BASE_DIR}/log/backend.log"
+# Create the log folder if it doesn't exist
+LOG_DIR="${BASE_DIR}/log"
+if [ ! -d "$LOG_DIR" ]; then
+  mkdir -p "$LOG_DIR"
+  echo "Created directory: $LOG_DIR"
 fi
 
-nohup python cli.py run-uvicorn >> "${BASE_DIR}/log/backend.log" 2>&1 &
+# Check if the nohup.out log output file exists
+LOG_FILE="${LOG_DIR}/backend.log"
+if [ ! -f "$LOG_FILE" ]; then
+  touch "$LOG_FILE"
+  echo "Created file: $LOG_FILE"
+fi
 
-echo "backend is starting，you can check the ${BASE_DIR}/log/backend.log"
+# Start the backend server in the background
+nohup python cli.py run-uvicorn >> "$LOG_FILE" 2>&1 &
+
+echo "Backend is starting, you can check the $LOG_FILE"

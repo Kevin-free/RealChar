@@ -5034,7 +5034,55 @@ You
 
 ---
 
-github action err: zsh:16: command not found: alembic
+```Yaml
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - "main"
+      - "kevin/main"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        # Don't forget to add environment vars as secrets in repository settings on GitHub
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            echo "Changing directory to /home/kevin/projects/161-WDXM"
+            cd /home/kevin/projects/161-WDXM
+            echo "Checking if directory exists..."
+            if [ -d "1618-RealChar" ]; then
+              echo "Directory exists. Changing directory and pulling from git..."
+              cd 1618-RealChar
+              git pull
+            else
+              echo "Directory does not exist. Cloning from git..."
+              git clone git@github.com:Kevin-free/RealChar.git 1618-RealChar
+              cd 1618-RealChar
+            fi
+            echo "Current branch/tag: ${GITHUB_REF}"
+            source $HOME/miniconda/bin/activate realchar-env
+            alembic upgrade head
+            ./scripts/restart_backend.sh
+            ./scripts/restart_web.sh
+```
+
+The Ubuntu server can successfully execute `alembic`, but the GitHub Action executes `alembic` and reports an error `err: zsh:16: command not found: alembic`, how to solve it? Isn't workflow using SSH in the server environment?
+
+---
+
+ChatGPT
+
+---
 
 ---
 
@@ -6097,5 +6145,185 @@ You
 ---
 
 How the domain name is associated to the server ip and port, such as `virtualifes.com` CDN to `120.79.65.120:3000`, and use SSL. Give me the specific method.
+
+---
+
+ChatGPT
+
+---
+
+To associate a domain name with a server IP and port, and to enable SSL for that domain, you can follow these steps:
+
+1. **Configure Domain Name and DNS:**
+
+   Purchase and configure your domain name (e.g., `virtualifes.com`) through a domain registrar like GoDaddy. In the DNS settings of your domain registrar, create an `A` record that points to your server's IP address (e.g., `120.79.65.120`).
+
+2. **Set Up Reverse Proxy:**
+
+   To route traffic from the domain to your server's IP and port, you can use a reverse proxy server like Nginx.
+
+   Install Nginx on your server:
+
+   ```bash
+   sudo apt update
+   sudo apt install nginx
+   ```
+
+   Create an Nginx configuration file for your domain:
+
+   ```bash
+   sudo nano /etc/nginx/sites-available/virtualifes.com
+   ```
+
+   Add the following content to the file:
+
+   ```nginx
+   server {
+       listen 80;
+       server_name virtualifes.com www.virtualifes.com;
+
+       location / {
+           proxy_pass http://127.0.0.1:3000;  # Forward to your server's IP and port
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+   }
+   ```
+
+   Save the file and create a symbolic link:
+
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/virtualifes.com /etc/nginx/sites-enabled/
+   ```
+
+   Test the Nginx configuration:
+
+   ```bash
+   sudo nginx -t
+   ```
+
+   If there are no errors, restart Nginx:
+
+   ```bash
+   sudo systemctl restart nginx
+   ```
+
+3. **Enable SSL with Let's Encrypt:**
+
+   To enable SSL for your domain, you can use Let's Encrypt to obtain a free SSL certificate.
+
+   Install Certbot:
+
+   ```bash
+   sudo apt install certbot python3-certbot-nginx
+   ```
+
+   Obtain an SSL certificate:
+
+   ```bash
+   sudo certbot --nginx -d virtualifes.com -d www.virtualifes.com
+   ```
+
+   Follow the prompts to complete the certificate issuance process.
+
+4. **Configure HTTPS Redirect:**
+
+   Update your Nginx configuration to redirect HTTP traffic to HTTPS:
+
+   Open the Nginx configuration file:
+
+   ```bash
+   sudo nano /etc/nginx/sites-available/virtualifes.com
+   ```
+
+   Add the following lines within the `server` block:
+
+   ```nginx
+   server {
+       listen 80;
+       server_name virtualifes.com www.virtualifes.com;
+       return 301 https://$host$request_uri;
+   }
+   ```
+
+   Save the file and test the Nginx configuration:
+
+   ```bash
+   sudo nginx -t
+   ```
+
+   If there are no errors, restart Nginx:
+
+   ```bash
+   sudo systemctl restart nginx
+   ```
+
+5. **Verify SSL Configuration:**
+
+   Visit your domain (e.g., `https://virtualifes.com`) in a web browser. You should see a secure connection with a valid SSL certificate.
+
+Your domain `virtualifes.com` should now be associated with your server's IP and port (`120.79.65.120:3000`) and have SSL enabled. Traffic will be routed through Nginx, which acts as a reverse proxy and handles the SSL termination.
+
+---
+
+You
+
+---
+
+```Shell
+#!/bin/bash
+# Start web server
+
+cd `dirname $0`/..
+export BASE_DIR=`pwd`
+echo $BASE_DIR
+
+# check the nohup.out log output file
+if [ ! -f "${BASE_DIR}/log/web.log" ]; then
+  touch "${BASE_DIR}/log/web.log"
+echo "create file  ${BASE_DIR}/log/web.log"
+fi
+
+cd client/web
+npm install
+npm start >> "${BASE_DIR}/log/web.log" 2>&1 &  # Redirect both stdout and stderr to the log file
+
+echo "web is starting，you can check the ${BASE_DIR}/log/web.log"
+
+```
+If the `log` folder does not exist, create it first.
+
+---
+
+ChatGPT
+
+---
+
+#!/bin/bash
+# Start web server
+
+cd "$(dirname "$0")/.."
+export BASE_DIR=$(pwd)
+echo "$BASE_DIR"
+
+# Create the log folder if it doesn't exist
+if [ ! -d "${BASE_DIR}/log" ]; then
+  mkdir -p "${BASE_DIR}/log"
+  echo "Created log folder: ${BASE_DIR}/log"
+fi
+
+# Check the nohup.out log output file
+if [ ! -f "${BASE_DIR}/log/web.log" ]; then
+  touch "${BASE_DIR}/log/web.log"
+  echo "Created file ${BASE_DIR}/log/web.log"
+fi
+
+cd client/web
+npm install
+npm start >> "${BASE_DIR}/log/web.log" 2>&1 &
+
+echo "Web server is starting. You can check the ${BASE_DIR}/log/web.log"
 
 ---
