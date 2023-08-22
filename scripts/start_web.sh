@@ -11,7 +11,6 @@ if [ ! -f "${BASE_DIR}/log/web.log" ]; then
 echo "create file  ${BASE_DIR}/log/web.log"
 fi
 
-python cli.py web-build
 cd client/web
 npm install
 npm start >> "${BASE_DIR}/log/web.log" 2>&1 &  # Redirect both stdout and stderr to the log file
