@@ -592,6 +592,7 @@ ChatGPT4
    ```
 
 3. 接下来，你将看到 Miniconda 的许可协议。按 `Enter` 继续，然后按 `yes` 接受许可协议。
+> 看到`Last updated March 21, 2022`停下，接下来输入`yes`，否则默认`no`给取消了。
 
 4. 你将被要求选择安装路径。你可以选择默认的位置或者指定一个新的安装路径。
 
@@ -5587,7 +5588,7 @@ Sure, here's a step-by-step guide on how to enable swap space on your Ubuntu ser
    Let's create a swap file in this example. You can adjust the size based on your needs. For instance, if you want to create a 2GB swap file:
 
    ```shell
-   sudo fallocate -l 2G /swapfile
+   sudo fallocate -l 1G /swapfile
    ```
 
 4. **Adjust Permissions and Format:**
