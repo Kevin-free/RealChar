@@ -172,4 +172,9 @@ cython_debug/
 google_credentials.json
 
 ./node_modules
-nohup.out
+
+# logs
+logs/
+
+# character resources (e.g., avatar, voice, background information)
+resources/
