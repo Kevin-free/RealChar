@@ -8305,7 +8305,7 @@ ChatGPT
 以下是您的 `docker-compose.yml` 文件，用于部署上述两个服务并满足要求：
 
 ```yaml
-version: '3'
+version: "3"
 
 services:
   realchar-backend:
@@ -8347,7 +8347,7 @@ You
 
 ---
 
-Web服务`https://truthai.fun/`请求API服务接口`https://api.truthai.fun/characters`返回status为`CORS error`，console输出`Access to fetch at 'https://api.truthai.fun/characters' from origin 'https://truthai.fun' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.`，怎么排查和解决？
+Web 服务`https://truthai.fun/`请求 API 服务接口`https://api.truthai.fun/characters`返回 status 为`CORS error`，console 输出`Access to fetch at 'https://api.truthai.fun/characters' from origin 'https://truthai.fun' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.`，怎么排查和解决？
 
 ---
 
@@ -8356,6 +8356,7 @@ You
 ---
 
 当前`nginx.conf`如下：
+
 ```
 server {
     listen 80;
@@ -8415,10 +8416,10 @@ server {
     }
 }
 ```
+
 如何排查和解决`CORS error`？是不是要加`add_header Access-Control-Allow-Origin '*';`？
 
 ---
-
 
 ChatGPT
 
@@ -8449,19 +8450,114 @@ You
 
 ---
 
-API服务端加了`add_header Access-Control-Allow-Origin *;`还是有CORS问题，是不是Web端的Nginx配置也要加？
+API 服务端加了`add_header Access-Control-Allow-Origin *;`还是有 CORS 问题，是不是 Web 端的 Nginx 配置也要加？
 
 ---
 
 Record
-how to set SSL?
+How to set SSL?
 
 ---
 
+Keyword: Certbot, SSL, HTTPS, Docker, Nginx.
+Ref:
 
+1. https://www.qiniu.com/qfans/qnso-69907026
+
+为您的 Docker 部署添加 SSL 证书以实现 HTTPS 访问涉及以下步骤：
+
+1. **获取 SSL 证书**：
+   首先，您需要获取有效的 SSL 证书。您可以从权威的 SSL 证书颁发机构（CA）购买证书，或者您也可以使用 Let's Encrypt 提供的免费证书。在这里，我们将使用 Let's Encrypt。
+
+2. **安装 Certbot 工具**：
+   Certbot 是一个用于管理 Let's Encrypt 证书的工具。在您的 Ubuntu 服务器上，通过以下命令安装 Certbot：
+
+   ```sh
+   sudo apt update
+   sudo apt install certbot
+   ```
+
+3. **获取证书**：
+   使用 Certbot 获取证书。执行以下命令来为您的域名获取证书：
+
+   ```sh
+   sudo certbot certonly --standalone -d truthai.fun -d api.truthai.fun
+   ```
+
+   这将通过 HTTP-01 挑战获取证书。如果您在生产环境中使用，请确保正确设置了防火墙以允许 80 端口的访问。
+
+4. **配置 Nginx 代理**：
+   确保您的 Nginx 配置已正确配置用于反向代理的位置块。以下是一个示例配置：
+
+   ```nginx
+   server {
+       listen 80;
+       server_name truthai.fun api.truthai.fun;
+
+       location / {
+           proxy_pass http://localhost:YOUR_APP_PORT;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+   }
+   ```
+
+   将 `YOUR_APP_PORT` 替换为您的应用程序监听的端口。
+
+5. **配置 HTTPS**：
+   在 Nginx 配置文件中，添加一个配置块以配置 HTTPS。以下是一个示例配置：
+
+   ```nginx
+   server {
+       listen 443 ssl;
+       server_name truthai.fun api.truthai.fun;
+
+       ssl_certificate /etc/letsencrypt/live/truthai.fun/fullchain.pem;
+       ssl_certificate_key /etc/letsencrypt/live/truthai.fun/privkey.pem;
+
+       location / {
+           proxy_pass http://localhost:YOUR_APP_PORT;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+   }
+   ```
+
+   确保将 `YOUR_APP_PORT` 替换为您的应用程序监听的端口，并替换 SSL 证书路径。
+
+6. **重启 Nginx**：
+   重启 Nginx 以使配置更改生效：
+
+   ```sh
+   sudo service nginx restart
+   ```
+
+   ⚠️ Docker 用 443 端口启动！
+
+⚠️ 拷贝`/etc/letsencrypt`到 Docker 容器中！
+
+7. **自动续订证书**：
+   Let's Encrypt 证书默认有效期为 90 天。为了自动续订证书，您可以将 Certbot 添加到定时任务中：
+
+   ```sh
+   sudo crontab -e
+   ```
+
+   添加以下行以在每天检查并续订证书：
+
+   ```sh
+   0 0 * * * /usr/bin/certbot renew --quiet
+   ```
+
+   这将在每天午夜自动检查证书并进行续订。
+
+通过以上步骤，您就可以为您的 Docker 部署添加 SSL 证书，并启用 HTTPS 访问。请确保您的服务器防火墙允许 443 端口的访问。
 
 ---
-
 
 Record
 How to solve CORS?
