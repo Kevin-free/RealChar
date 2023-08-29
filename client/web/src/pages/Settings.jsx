@@ -38,6 +38,10 @@ const Settings = ({
   setQuivrApiKey,
   quivrBrainId,
   setQuivrBrainId,
+  useMultiOn,
+  setUseMultiOn,
+  useEchoCancellation,
+  setUseEchoCancellation,
   send,
   connect,
   setIsCallView,
@@ -87,7 +91,11 @@ const Settings = ({
         '&selectedModel=' +
         selectedModel +
         '&useSearchParam=' +
-        useSearch
+        useSearch +
+        '&useMultiOnParam=' +
+        useMultiOn +
+        '&useEchoCancellationParam=' +
+        useEchoCancellation
     );
   };
 
@@ -128,6 +136,10 @@ const Settings = ({
         setQuivrApiKey={setQuivrApiKey}
         quivrBrainId={quivrBrainId}
         setQuivrBrainId={setQuivrBrainId}
+        useMultiOn={useMultiOn}
+        setUseMultiOn={setUseMultiOn}
+        useEchoCancellation={useEchoCancellation}
+        setUseEchoCancellation={setUseEchoCancellation}
         send={send}
       />
 

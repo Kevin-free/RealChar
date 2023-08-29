@@ -27,8 +27,11 @@ const Conversation = ({
   handleStopCall,
   handleContinueCall,
   audioQueue,
+  audioContextRef,
+  audioSourceNodeRef,
   setIsPlaying,
   handleDisconnect,
+  isCallView,
   setIsCallView,
   send,
   stopAudioPlayback,
@@ -37,6 +40,7 @@ const Conversation = ({
   messageInput,
   setMessageInput,
   setUseSearch,
+  setUseEchoCancellation,
   callActive,
   startRecording,
   stopRecording,
@@ -49,6 +53,7 @@ const Conversation = ({
   setSelectedCharacter,
   setSelectedModel,
   setSelectedDevice,
+  setUseMultiOn,
   connect,
 }) => {
   const navigate = useNavigate();
@@ -60,10 +65,13 @@ const Conversation = ({
     isCallViewParam = '',
     preferredLanguage = '',
     useSearchParam = '',
+    useEchoCancellationParam = '',
+    useMultiOnParam = '',
   } = queryString.parse(search);
-  const isCallView = isCallViewParam === 'true';
+  const isCallViewUrl = isCallViewParam === 'true';
   const useSearch = useSearchParam === 'true';
-
+  const useEchoCancellation = useEchoCancellationParam === 'true';
+  const useMultiOn = useMultiOnParam === 'true';
   const message = isTextStreaming ? '' : textAreaValue;
   const [emotion, setEmotion] = useState('');
 
@@ -82,9 +90,10 @@ const Conversation = ({
       character === '' ||
       selectedModel === '' ||
       selectedDevice === '' ||
-      isCallView === '' ||
+      isCallViewUrl === '' ||
       preferredLanguage === '' ||
-      useSearch === ''
+      useSearch === '' ||
+      useEchoCancellation === ''
     ) {
       navigate('/');
     }
@@ -97,11 +106,15 @@ const Conversation = ({
 
     setSelectedDevice(selectedDevice);
 
-    setIsCallView(isCallView);
+    setIsCallView(isCallViewUrl);
 
     setPreferredLanguage(preferredLanguage);
 
     setUseSearch(useSearch);
+
+    setUseEchoCancellation(useEchoCancellation);
+
+    setUseMultiOn(useMultiOn);
   }, []);
 
   useEffect(() => {
@@ -166,6 +179,8 @@ const Conversation = ({
           handleStopCall={handleStopCall}
           handleContinueCall={handleContinueCall}
           audioQueue={audioQueue}
+          audioContextRef={audioContextRef}
+          audioSourceNodeRef={audioSourceNodeRef}
           setIsPlaying={setIsPlaying}
           handleDisconnect={handleDisconnect}
           setIsCallView={setIsCallView}
