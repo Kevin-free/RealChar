@@ -32,7 +32,8 @@ docker tag <image_name>:<tag> <docker_hub_username>/<image_name>:<tag>
 docker tag realchar-web:latest taokevin1024/realchar-web:latest
 ```
 
-build & tag
+### build & tag
+
 ```Shell
 docker build --platform linux/amd64 -t taokevin1024/realchar-web:latest .
 ```
@@ -54,9 +55,13 @@ docker push taokevin1024/realchar-web:latest
 
 ### 拉取镜像
 
+API 后端服务：
+
 ```Shell
 docker pull taokevin1024/realchar:latest
 ```
+
+Web 服务
 
 ```Shell
 docker pull taokevin1024/realchar-web:latest
@@ -73,7 +78,23 @@ docker run -d --env-file .env --name realchar-backend -p 8000:8000 taokevin1024/
 Docker Run Web Server:
 
 ```Shell
+docker run -d --name realchar-web -p 80:80 -v /etc/letsencrypt:/etc/letsencrypt taokevin1024/realchar-web:latest
+
 docker run -d --name realchar-web -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt taokevin1024/realchar-web:latest
+
+docker run -d --name realchar-web -p 80:80 -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt taokevin1024/realchar-web:latest
+```
+
+### 查看日志
+
+```Shell
+docker logs -f <container_name>
+```
+
+### 进入容器
+
+```Shell
+dcoker exec -it <container_name> /bin/sh
 ```
 
 ### 停止容器

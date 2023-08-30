@@ -8559,6 +8559,14 @@ Ref:
 
 ---
 
+You
+
+---
+
+服务器IP是`182.160.6.95`，接口地址是`https://api.truthai.fun/characters`，如何用命令测试API接口？
+
+---
+
 Record
 How to solve CORS?
 
