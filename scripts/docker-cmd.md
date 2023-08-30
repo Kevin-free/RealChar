@@ -78,11 +78,7 @@ docker run -d --env-file .env --name realchar-backend -p 8000:8000 taokevin1024/
 Docker Run Web Server:
 
 ```Shell
-docker run -d --name realchar-web -p 80:80 -v /etc/letsencrypt:/etc/letsencrypt taokevin1024/realchar-web:latest
-
 docker run -d --name realchar-web -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt taokevin1024/realchar-web:latest
-
-docker run -d --name realchar-web -p 80:80 -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt taokevin1024/realchar-web:latest
 ```
 
 ### 查看日志
