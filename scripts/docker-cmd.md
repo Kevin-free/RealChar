@@ -78,6 +78,10 @@ docker run -d --env-file .env --name realchar-backend -p 8000:8000 taokevin1024/
 Docker Run Web Server:
 
 ```Shell
+docker run -d --name realchar-web -p 80:80 taokevin1024/realchar-web:latest
+```
+
+```Shell
 docker run -d --name realchar-web -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt taokevin1024/realchar-web:latest
 ```
 
@@ -104,3 +108,16 @@ docker stop <container_name>
 ```Shell
 docker rm <container_name>
 ```
+
+### 删除未使用的镜像
+
+```Shell
+docker image prune
+```
+
+### 删除未使用的镜像、停止的容器、无用的网络和挂载卷
+
+```Shell
+docker system prune
+```
+

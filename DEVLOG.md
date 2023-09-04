@@ -166,6 +166,89 @@ References:
 1. https://zhuanlan.zhihu.com/p/53407930
 2. https://www.qiniu.com/qfans/qnso-69907026
 
+## Server Settings
+
+### install Zsh on Ubuntu
+
+安装和配置 Zsh 以及设置 Powerlevel10k 主题和插件的步骤如下：
+
+1. **安装 Zsh**：
+
+如果您的系统上尚未安装 Zsh，可以通过以下命令安装：
+
+```bash
+sudo apt update
+sudo apt install zsh
+```
+
+2. **设置 Zsh 为默认 Shell**：
+
+安装完成后，您可以将 Zsh 设置为默认的 Shell：
+
+```bash
+chsh -s $(which zsh)
+```
+
+3. **安装 Oh My Zsh**：
+
+Oh My Zsh 是一个社区驱动的 Zsh 配置框架，使您可以轻松配置和扩展 Zsh。使用以下命令安装 Oh My Zsh：
+
+```bash
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+4. **安装 Powerlevel10k 主题**：
+
+Powerlevel10k 是一个受欢迎的 Zsh 主题，可以通过以下步骤安装：
+
+```bash
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+```
+
+5. **安装自动建议插件**：
+
+安装并启用 Zsh 自动建议插件：
+
+```bash
+git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+```
+
+6. **配置 Zsh 插件和主题**：
+
+编辑 `~/.zshrc` 文件以进行配置：
+
+```bash
+nano ~/.zshrc
+```
+
+找到 `ZSH_THEME` 行并将其更改为：
+
+```bash
+ZSH_THEME="powerlevel10k/powerlevel10k"
+```
+
+在配置文件中添加插件，将以下行添加到文件底部：
+
+```bash
+plugins=(git zsh-autosuggestions)
+```
+
+7. **应用配置变更**：
+
+保存并关闭 `~/.zshrc` 文件。然后运行以下命令以使更改生效：
+
+```bash
+source ~/.zshrc
+```
+
+Powerlevel10k 主题将会引导您完成初始化设置。按照屏幕上的提示，根据您的偏好进行选择。
+
+8. **重启终端**：
+
+重启终端以使所有更改生效。您应该会看到新的 Powerlevel10k 主题和自动建议功能。
+
+现在您已经成功安装和配置了 Zsh、Powerlevel10k 主题和插件。享受更丰富的终端体验吧！
+
 ## QA
 
 ### CORS
@@ -254,4 +337,66 @@ server {
         proxy_pass http://182.160.6.95:8000;
      }
 }
+```
+
+### WebSocket
+
+Web Console Error:
+`useWebsocket.js:47 WebSocket connection to 'wss://api.truthai.fun/ws/6c6858b4b5674339bf4ed6c5e16e7e61?llm_model=gpt-3.5-turbo-16k&platform=web&use_search=false&use_quivr=false&use_multion=false&character_id=elon_musk&language=en-US&token=' failed: `
+
+API Server Error:
+`"GET /ws/92f427a147e243b791a5ea75cd2f7b71?llm_model=gpt-3.5-turbo-16k&platform=web&use_search=false&use_quivr=false&use_multion=false&character_id=elon_musk&language=en-US&token= HTTP/1.0" 404 Not Found`
+
+Solution:
+in API Server part of `nginx.conf` add:
+
+```conf
+server {
+     listen 443 ssl;
+     server_name api.truthai.fun;
+
+     # Other Settings
+
+     location / {
+        # Change to the IP and port of the API service (Note: nginx is in Docker, the IP needs to be the host, not localhost)
+        proxy_pass http://182.160.6.95:8000;
+        # The following four lines correctly handle WebSocket connections
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+     }
+}
+```
+
+### Firebase
+
+Web Console Error:
+`SignIn.js:57 Error occurred during sign in. Code: auth/unauthorized-domain, Message: Firebase: Error (auth/unauthorized-domain).`
+Info:
+`Info: The current domain is not authorized for OAuth operations. This will prevent signInWithPopup, signInWithRedirect, linkWithPopup and linkWithRedirect from working. Add your domain (truthai.fun) to the OAuth redirect domains list in the Firebase console -> Authentication -> Settings -> Authorized domains tab.`
+
+Solution:
+
+1. Visit Firebase Console `https://console.firebase.google.com/`
+2. "Create Project"
+3. "Build"->"Authentication"->"Sign-in method" Enable Google
+4. "Build"->"Authentication"->"Settings" Domains add "truthai.fun"
+5. "project overview"->"project settings"->"add app"->copy firebaseConfig code
+
+update `firebaseConfig` to `RealChar/client/web/src/utils
+/firebase.js`
+
+```Javascript
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBRqFxecZYe87DnYh7gYyzY_goAKmhrpV8",
+  authDomain: "realchar-a58de.firebaseapp.com",
+  projectId: "realchar-a58de",
+  storageBucket: "realchar-a58de.appspot.com",
+  messagingSenderId: "329881922764",
+  appId: "1:329881922764:web:86620c703c32f2a608a669",
+  measurementId: "G-CN8CGSZV9M"
+};
 ```
