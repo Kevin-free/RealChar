@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  realchar-backend:
+    image: taokevin1024/realchar:latest
+    container_name: realchar-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+      
