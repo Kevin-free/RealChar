@@ -9871,3 +9871,63 @@ You
 [render](https://render.com/)收费吗？对于部署docker服务商业化怎么样？怎么使用？
 
 ---
+
+You
+
+---
+
+在服务器上运行`docker-compose -f docker-compose-backend.yml down`，报错：
+```Shell
+Removing network realchar_default
+WARNING: Network realchar_default not found.
+```
+要怎么解决？如何修改`build_push_deploy_backend.yml`？
+
+```build_push_deploy_backend.yml
+name: Build Push and Deploy Backend Docker Image
+
+on:
+  release:
+    types: [published]  # This triggers the workflow when a release is published
+  push:
+    branches:
+      - "kevin/main"
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and Push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        push: true
+        tags: taokevin1024/realchar-backend:latest
+
+  deploy:
+    needs: [build-and-push-image]
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_USER_PASSWORD }}
+          script: |  
+            cd /home/kevin/project/realchar
+            docker-compose -f docker-compose-backend.yml down
+            docker-compose -f docker-compose-backend.yml pull
+            docker-compose -f docker-compose-backend.yml up -d
+```
+
+---

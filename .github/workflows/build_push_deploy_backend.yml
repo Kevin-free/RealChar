@@ -39,6 +39,5 @@ jobs:
           password: ${{ secrets.SERVER_USER_PASSWORD }}
           script: |  
             cd /home/kevin/project/realchar
-            docker-compose -f docker-compose-backend.yml down
-            docker-compose -f docker-compose-backend.yml pull
-            docker-compose -f docker-compose-backend.yml up -d
+            docker pull taokevin1024/realchar-backend:latest
+            docker run -d --env-file .env --name realchar-backend -p 8000:8000 taokevin1024/realchar-backend:latest
