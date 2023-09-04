@@ -25,7 +25,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         push: true
-        tags: taokevin1024/real_char:latest
+        tags: taokevin1024/realchar-backend:latest
 
   deploy:
     needs: [build-and-push-image]
