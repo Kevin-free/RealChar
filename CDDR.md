@@ -9861,3 +9861,13 @@ You
 给我介绍json和protobuffer的区别，尤其是面试时如何回答。
 
 ---
+
+## 20230904 
+
+You
+
+---
+
+[render](https://render.com/)收费吗？对于部署docker服务商业化怎么样？怎么使用？
+
+---
