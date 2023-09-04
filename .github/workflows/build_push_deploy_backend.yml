@@ -25,7 +25,6 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        file: ./Dockerfile
         platforms: linux/amd64
         push: true
         tags: taokevin1024/real_char:latest
