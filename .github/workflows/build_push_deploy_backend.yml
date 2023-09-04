@@ -28,6 +28,7 @@ jobs:
         tags: taokevin1024/real_char:latest
 
   deploy:
+    needs: [build-and-push-image]
     runs-on: ubuntu-latest
     steps:
       - name: SSH and Deploy
@@ -37,6 +38,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |  
+            cd /home/kevin/project/realchar
             docker-compose -f docker-compose-backend.yml down
             docker-compose -f docker-compose-backend.yml pull
             docker-compose -f docker-compose-backend.yml up -d
