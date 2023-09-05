@@ -1,4 +1,4 @@
-name: Build Push and Deploy Docker Image for Backend
+name: Create and Deploy Docker for Backend
 
 on:
   release:
