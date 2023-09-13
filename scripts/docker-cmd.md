@@ -121,3 +121,74 @@ docker image prune
 docker system prune
 ```
 
+## docker-compose 常用命令
+
+> 💡 需要在 `docker-compose.yml` 所在位置执行 `docker-compose` 命令。
+
+1. **docker-compose up**：启动容器，创建并启动所有在 `docker-compose.yml` 文件中定义的服务。
+
+   ```bash
+   docker-compose up
+   ```
+
+2. **docker-compose up -d**：以后台模式启动容器，创建并启动所有在 `docker-compose.yml` 文件中定义的服务。
+
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **docker-compose down**：停止并移除所有在 `docker-compose.yml` 文件中定义的服务的容器、网络和卷。
+
+   ```bash
+   docker-compose down
+   ```
+
+4. **docker-compose ps**：查看所有正在运行的服务的容器状态。
+
+   ```bash
+   docker-compose ps
+   ```
+
+5. **docker-compose logs**：查看服务的容器日志输出。
+
+   ```bash
+   docker-compose logs
+   ```
+
+6. **docker-compose logs <service-name>**：查看特定服务的容器日志输出。
+
+   ```bash
+   docker-compose logs <service-name>
+   ```
+
+7. **docker-compose exec <service-name> <command>**：在运行中的服务容器内执行命令。
+
+   ```bash
+   docker-compose exec <service-name> <command>
+   ```
+
+8. **docker-compose build**：根据 `docker-compose.yml` 文件中的定义重新构建服务的镜像。
+
+   ```bash
+   docker-compose build
+   ```
+
+9. **docker-compose pull**：拉取服务的镜像，但不重新构建它们。
+
+   ```bash
+   docker-compose pull
+   ```
+
+10. **docker-compose restart <service-name>**：重启特定服务的容器。
+
+    ```bash
+    docker-compose restart <service-name>
+    ```
+
+11. **docker-compose stop <service-name>**：停止特定服务的容器。
+
+    ```bash
+    docker-compose stop <service-name>
+    ```
+
+这些命令可以帮助你管理和操作 Docker Compose 项目中的容器化服务。根据你的项目需求，你可以选择合适的命令来管理服务。
