@@ -1,5 +1,42 @@
 # DEVLOG
 
+### 同步 fork 仓库 git 命令
+
+1.  git remote -v 查看你的远程仓库的路径：
+
+> 如果只有 origin 的两行, 说明你未设置 upstream （中文叫：上游代码库）
+> 一般情况下，设置好一次 upstream 后就无需重复设置。
+
+2.  执行命令 git remote add upstream [https://github.com/selfteaching/the-craft-of-selfteaching.git](https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fselfteaching%2Fthe-craft-of-selfteaching.git)
+3.  再次执行命令 git remote -v 检查是否成功
+4.  将未提交的提交
+
+5.  执行命令 git fetch upstream 抓取原仓库的更新
+6.  执行命令 git merge upstream/master 合并远程的 master 分支
+7.  执行命令 git push 把本地仓库向 github 仓库（你 fork 到自己名下的仓库）推送修改
+
+### 总结：
+
+```Shell
+git fetch upstream
+
+git merge upstream/master
+
+git push
+```
+
+### 切分支合并 main 分支 git 命令
+
+```Shell
+git switch -c new-branch (if new-branch not exist)
+
+git switch new-branch
+
+git merge main
+
+git push
+```
+
 ## Deploy to Ubuntu
 
 ### Add SSL to use HTTPS
