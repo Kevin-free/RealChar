@@ -23,13 +23,15 @@ from realtime_ai_character.logger import get_logger
 from realtime_ai_character.models.interaction import Interaction
 from realtime_ai_character.models.quivr_info import QuivrInfo
 from realtime_ai_character.utils import (ConversationHistory, build_history,
-                                         get_connection_manager)
+                                         get_connection_manager, get_timer)
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
 manager = get_connection_manager()
+
+timer = get_timer()
 
 GREETING_TXT_MAP = {
     "en-US": "Hi, my friend, what brings you here today?",
@@ -75,7 +77,8 @@ async def check_session_auth(session_id: str, user_id: str, db: Session) -> Sess
             is_authenticated_user=True,
         )
     try:
-        original_chat = db.query(Interaction).filter(Interaction.session_id == session_id).first()
+        original_chat = await asyncio.to_thread(
+            db.query(Interaction).filter(Interaction.session_id == session_id).first)
     except Exception as e:
         logger.info(f'Failed to lookup session {session_id} with error {e}')
         return SessionAuthResult(
@@ -161,7 +164,7 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
         conversation_history = ConversationHistory()
         if load_from_existing_session:
             logger.info(f"User #{user_id} is loading from existing session {session_id}")
-            conversation_history.load_from_db(session_id=session_id, db=db)
+            await asyncio.to_thread(conversation_history.load_from_db, session_id=session_id, db=db)
 
         # 0. Receive client platform info (web, mobile, terminal)
         if not platform:
@@ -255,12 +258,16 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                     pass
                 tts_event.clear()
 
+        speech_recognition_interim = False
+        current_speech = ''
+
         while True:
             data = await websocket.receive()
             if data['type'] != 'websocket.receive':
                 raise WebSocketDisconnect('disconnected')
             # handle text message
             if 'text' in data:
+                timer.start("LLM First Token")
                 msg_data = data['text']
                 # Handle client side commands
                 if msg_data.startswith('[!'):
@@ -286,15 +293,34 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                                 text_to_speech, websocket, tts_event,
                                 character.voice_id)))
                     continue
+                # 1. Whether client will send speech interim audio clip in the next message.
+                if msg_data.startswith('[&Speech]'):
+                    speech_recognition_interim = True
+                    continue
 
-                # 1. Send "thinking" status over websocket
+                # 2. If client finished speech, use the sentence as input.
+                if msg_data.startswith('[SpeechFinished]'):
+                    msg_data = current_speech
+                    logger.info(f"Full transcript: {current_speech}")
+                    # Stop recognizing next audio as interim.
+                    speech_recognition_interim = False
+                    # Filter noises
+                    if not current_speech:
+                        continue
+
+                    await manager.send_message(
+                        message=f'[+]You said: {current_speech}', websocket=websocket)
+                    current_speech = ''
+
+                # 2. Send "thinking" status over websocket
                 if use_search or use_quivr:
                     await manager.send_message(message='[thinking]\n',
                                                websocket=websocket)
 
-                # 2. Send message to LLM
+                # 3. Send message to LLM
                 if use_quivr:
-                    quivr_info = db.query(QuivrInfo).filter(QuivrInfo.user_id == user_id).first()
+                    quivr_info = await asyncio.to_thread(
+                        db.query(QuivrInfo).filter(QuivrInfo.user_id == user_id).first)
                 else:
                     quivr_info = None
                 message_id = str(uuid.uuid4().hex)[:16]
@@ -330,7 +356,7 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                     tools.append('quivr')
                 if use_multion:
                     tools.append('multion')
-                Interaction(user_id=user_id,
+                interaction = Interaction(user_id=user_id,
                             session_id=session_id,
                             client_message_unicode=msg_data,
                             server_message_unicode=response,
@@ -340,19 +366,42 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                             tools=','.join(tools),
                             language=language,
                             message_id=message_id,
-                            llm_config=llm.get_config()).save(db)
+                            llm_config=llm.get_config())
+                await asyncio.to_thread(interaction.save, db)
 
             # handle binary message(audio)
             elif 'bytes' in data:
                 binary_data = data['bytes']
+                # 0. Handle interim speech.
+                if speech_recognition_interim:
+                    interim_transcript: str = (
+                        await asyncio.to_thread(
+                            speech_to_text.transcribe,
+                            binary_data,
+                            platform=platform,
+                            prompt=current_speech,
+                            suppress_tokens=[0, 11, 13, 30],
+                        )
+                    ).strip()
+                    speech_recognition_interim = False
+                    # Filter noises.
+                    if not interim_transcript:
+                        continue
+                    logger.info(f"Speech interim: {interim_transcript}")
+                    current_speech = current_speech + ' ' + interim_transcript
+                    continue
+
                 # 1. Transcribe audio
-                transcript: str = (await asyncio.to_thread(speech_to_text.transcribe, 
+                transcript: str = (await asyncio.to_thread(speech_to_text.transcribe,
                     binary_data, platform=platform,
                     prompt=character.name)).strip()
 
                 # ignore audio that picks up background noise
                 if (not transcript or len(transcript) < 2):
                     continue
+
+                # start counting time for LLM to generate the first token
+                timer.start("LLM First Token")
 
                 # 2. Send transcript to client
                 await manager.send_message(
@@ -379,7 +428,7 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                         tools.append('quivr')
                     if use_multion:
                         tools.append('multion')
-                    Interaction(user_id=user_id,
+                    interaction = Interaction(user_id=user_id,
                                 session_id=session_id,
                                 client_message_unicode=transcript,
                                 server_message_unicode=response,
@@ -388,7 +437,8 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                                 character_id=character_id,
                                 tools=','.join(tools),
                                 language=language,
-                                llm_config=llm.get_config()).save(db)
+                                llm_config=llm.get_config())
+                    await asyncio.to_thread(interaction.save, db)
 
                 # 4. Send "thinking" status over websocket
                 if use_search or use_quivr:
@@ -397,7 +447,8 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
 
                 # 5. Send message to LLM
                 if use_quivr:
-                    quivr_info = db.query(QuivrInfo).filter(QuivrInfo.user_id == user_id).first()
+                    quivr_info = await asyncio.to_thread(
+                        db.query(QuivrInfo).filter(QuivrInfo.user_id == user_id).first)
                 else:
                     quivr_info = None
                 tts_task = asyncio.create_task(
@@ -416,9 +467,13 @@ async def handle_receive(websocket: WebSocket, session_id: str, user_id: str, db
                               useMultiOn=use_multion,
                               quivrApiKey=quivr_info.quivr_api_key if quivr_info else None,
                               quivrBrainId=quivr_info.quivr_brain_id if quivr_info else None))
+                
+            # log latency info
+            timer.report()
 
     except WebSocketDisconnect:
         logger.info(f"User #{user_id} closed the connection")
+        timer.reset()
         await manager.disconnect(websocket)
         await memory_manager.process_session(session_id)
         return
