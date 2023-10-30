@@ -35,7 +35,7 @@ export const createWebRTCSlice = (set, get) => ({
     audioContext: null,
 
     rtcConnectionEstablished: false,
-    connectPeer: async(onTrack) => {
+    connectPeer: async() => {
         if (get().pc) {
             console.log('Should not call connectPeer if webrtc connection already established!');
         }
@@ -52,10 +52,14 @@ export const createWebRTCSlice = (set, get) => ({
         otherPC.onicecandidate = e =>
             e.candidate &&
             pc.addIceCandidate(new RTCIceCandidate(e.candidate));
-        pc.ontrack = onTrack;
+        pc.ontrack = event => {
+            if (event.streams && event.streams[0]) {
+                get().audioPlayerRef.current.srcObject = event.streams[0];
+            }
+        }
         const stream = await navigator.mediaDevices.getUserMedia({
             audio: {
-                deviceId: get().selectedMicrophone,
+                deviceId: get().selectedMicrophone.values().next().value,
                 echoCancellation: true,
                 noiseSuppression: true,
             },
@@ -95,6 +99,7 @@ export const createWebRTCSlice = (set, get) => ({
         return new Promise(resolve => {
             pc.oniceconnectionstatechange = e => {
                 if (pc.iceConnectionState === 'connected') {
+                    console.log('WebRTC ICE Connected!');
                     set({rtcConnectionEstablished: true});
                     resolve();
                 }
@@ -106,7 +111,8 @@ export const createWebRTCSlice = (set, get) => ({
         get().otherPC.close();
         set({
             pc: null,
-            otherPC: null
+            otherPC: null,
+            rtcConnectionEstablished: false
         });
     }
 });

@@ -6,19 +6,16 @@ import { IoPaperPlaneOutline } from 'react-icons/io5';
 import { FaRegKeyboard } from 'react-icons/fa';
 import Image from 'next/image';
 import talkSvg from '@/assets/svgs/talk.svg';
-import micSvg from '@/assets/svgs/microphone.svg';
-import pauseSvg from '@/assets/svgs/pause.svg';
+import ClickToTalk from './ClickToTalk';
 import {useAppStore} from "@/lib/store";
 
 export default function InputField() {
   const [text, setText] = useState('');
-  const [inputMode, setInputMode] = useState('text');
-  const [isTalking, setIsTalking] = useState(false);
+  const [isTextInput, setIsTextInput] = useState(true);
   const {sendOverSocket, appendUserChat} = useAppStore();
   const {stopAudioPlayback} = useAppStore();
-  const {startRecording, stopRecording} = useAppStore();
 
-  function handleOnEnter(text) {
+  function handleOnEnter() {
     if (text) {
       stopAudioPlayback();
       appendUserChat(text);
@@ -26,29 +23,19 @@ export default function InputField() {
     }
   }
 
-  function startTalk() {
-    setIsTalking(true);
-    startRecording();
-  }
-
-  function stopTalk() {
-    setIsTalking(false);
-    stopRecording();
-  }
-
   return (
-    <div className="flex justify-center pb-10 md:mx-auto md:w-unit-9xl lg:w-[892px]">
-      {inputMode === 'text' && (
-      <div className="flex flex-row justify-center gap-4 w-full pb-10">
+    <div className="flex justify-center md:mx-auto md:w-unit-9xl lg:w-[892px]">
+      {isTextInput && (
+      <div className="flex flex-row justify-center gap-2 w-full pb-7 pt-6">
         <Tooltip content="Talk">
           <Button
             isIconOnly
             variant="bordered"
             color="white"
             radius="full"
-            size="lg"
+            size="md"
             onPress={() =>
-              setInputMode('talk')
+              setIsTextInput(false)
             }
           >
             <Image
@@ -68,71 +55,33 @@ export default function InputField() {
           fontFamily=""
         />
         <Button
-          size="lg"
-          className="bg-real-navy px-2 min-w-fit sm:min-w-16 sm:px-4"
+          size="md"
+          className="bg-real-navy px-2 min-w-fit sm:min-w-16 sm:px-4 hidden md:flex"
           onPress={handleOnEnter}
         >
-          <IoPaperPlaneOutline size="2em"/>
-          <span className="hidden sm:inline">Send</span>
+          <IoPaperPlaneOutline size="1.5em"/>
+          <span className="hidden lg:inline">Send</span>
         </Button>
       </div>
       )}
-      {inputMode === 'talk' && !isTalking && (
-      <div className="flex flex-row items-center">
+      {!isTextInput && (
+      <div className="flex flex-row items-center pt-4">
         <Tooltip content="Text">
           <Button
             isIconOnly
             variant="bordered"
             radius="full"
             color="white"
-            size="lg"
+            size="md"
             onPress={() =>
-              setInputMode('text')
+              setIsTextInput(true)
             }
-            className="-ml-24"
+            className="-ml-[72px] md:-ml-[88px]"
           >
             <FaRegKeyboard/>
           </Button>
         </Tooltip>
-        <div className="text-center ml-12">
-          <Button
-            isIconOnly
-            size="lg"
-            radius="full"
-            className="bg-real-navy w-24 h-24 mb-4"
-            onPress={startTalk}
-          >
-            <Image
-              priority
-              src={micSvg}
-              alt="microphone button"
-              className="w-6"
-            />
-          </Button>
-          <p className="font-light">Click and start talking</p>
-        </div>
-      </div>
-      )}
-      {inputMode === 'talk' && isTalking && (
-      <div className="text-center">
-          <p className="font-light">You <span className="text-white/50">are speaking...</span></p>
-        <div className="mt-10 mb-4">
-          <span className="animate-ping absolute w-24 h-24 bg-real-navy opacity-50 rounded-full"></span>
-          <Button
-            isIconOnly
-            radius="full"
-            size="lg"
-            onPress={stopTalk}
-            className="bg-real-navy w-24 h-24"
-          >
-            <Image
-              priority
-              src={pauseSvg}
-              alt="pause button"
-            />
-          </Button>
-        </div>
-        <p className="font-light">Click and stop talking</p>
+        <ClickToTalk className="text-center ml-8 md:ml-12"/>
       </div>
       )}
     </div>
